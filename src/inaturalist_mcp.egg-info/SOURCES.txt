@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+src/inaturalist_mcp/__init__.py
+src/inaturalist_mcp/client.py
+src/inaturalist_mcp/server.py
+src/inaturalist_mcp.egg-info/PKG-INFO
+src/inaturalist_mcp.egg-info/SOURCES.txt
+src/inaturalist_mcp.egg-info/dependency_links.txt
+src/inaturalist_mcp.egg-info/entry_points.txt
+src/inaturalist_mcp.egg-info/requires.txt
+src/inaturalist_mcp.egg-info/top_level.txt
+tests/test_client.py
