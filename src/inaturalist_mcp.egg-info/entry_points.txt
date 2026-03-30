@@ -1,2 +1,0 @@
-[console_scripts]
-inaturalist-mcp = inaturalist_mcp.server:main
