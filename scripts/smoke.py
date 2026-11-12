@@ -42,7 +42,7 @@ async def main() -> None:
                 "params": {
                     "protocolVersion": "2024-11-05",
                     "capabilities": {},
-                    "clientInfo": {"name": "smoke-test", "version": "0.2.0"},
+                    "clientInfo": {"name": "smoke-test", "version": "1.0.0"},
                 },
             }
             process.stdin.write((json.dumps(init_msg) + "\n").encode())
@@ -81,13 +81,18 @@ async def main() -> None:
                 "get_taxon_details",
                 "get_observation_details",
                 "search_places",
+                "get_nearby_places",
                 "species_counts_nearby",
                 "search_projects",
                 "user_observations",
+                "get_similar_species",
+                "get_species_phenology",
+                "get_controlled_terms",
+                "view_observation_photos",
             }
             missing = expected_tools - tool_names
             assert expected_tools.issubset(tool_names), f"Missing tools: {missing}"
-            assert len(tools) == 12, f"Expected 12 tools, found {len(tools)}"
+            assert len(tools) == 17, f"Expected 17 tools, found {len(tools)}"
 
             print(
                 f"Installed wheel v{inaturalist_mcp.__version__}: "

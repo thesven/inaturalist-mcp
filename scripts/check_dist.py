@@ -8,7 +8,7 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 dist_dir = root / "dist"
-archives = sorted(dist_dir.glob("inaturalist_mcp-0.2.0*"))
+archives = sorted(dist_dir.glob("inaturalist_mcp-1.0.0*"))
 assert len(archives) == 2, f"Expected a wheel and a source archive, found: {archives}"
 
 for path in archives:

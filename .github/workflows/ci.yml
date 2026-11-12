@@ -53,4 +53,4 @@ jobs:
         run: uv run python scripts/check_dist.py
 
       - name: Run stdio smoke test against installed wheel
-        run: uv run --no-project --with ./dist/inaturalist_mcp-0.2.0-py3-none-any.whl python scripts/smoke.py
+        run: uv run --no-project --with ./dist/inaturalist_mcp-*.whl python scripts/smoke.py
