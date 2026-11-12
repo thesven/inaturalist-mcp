@@ -165,6 +165,79 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 
 ---
 
+## Environment Variables & Configuration
+
+| Variable | Required | Default | Description |
+| :--- | :---: | :---: | :--- |
+| `INATURALIST_API_TOKEN` | Optional | `None` | iNaturalist OAuth Bearer token for authenticated API queries and higher rate limits. |
+| `INAT_API_TOKEN` | Optional | `None` | Alias for `INATURALIST_API_TOKEN`. |
+
+---
+
+## Deep-Dive Capabilities
+
+### 1. Multimodal Visual Inspection (`view_observation_photos`)
+Rather than forcing models to rely exclusively on observer text descriptions, `view_observation_photos` retrieves 500px medium-resolution observation images, encodes them as base64 JPEG byte streams, and embeds them directly into the conversation turn as native `ImageContent` blocks. Vision-capable models (Claude 3.5 Sonnet, Claude 3 Opus, GPT-4o) can immediately inspect:
+- Diagnostic wing bars, eyering patterns, and bill culmen curves on birds.
+- Ventral vs. dorsal wing patterns on Lepidoptera (e.g. postmedian line on viceroys).
+- Leaf margins (entire, serrate, lobed) and leaf venation on botanic specimens.
+- Hymenial surface structure (gills, pores, teeth) on fungal fruiting bodies.
+
+### 2. Lookalike Confusion Matrix (`get_similar_species`)
+iNaturalist's `/v1/identifications/similar_species` endpoint measures empirical observer confusion across hundreds of millions of identifications. By calling `get_similar_species(taxon_id)`, the model discovers:
+- Top candidate species most frequently mistaken for the target organism.
+- Mutual identification disagreement frequencies.
+- Ranked risk of misidentification in a specific geographic place.
+
+### 3. Seasonality Curves (`get_species_phenology`)
+Prevents models from recommending phenologically impossible species (e.g., claiming a migratory warbler was seen in Michigan during January). The tool provides a structured 12-month table with an ASCII histogram:
+
+```text
+Month | Observations | Relative Seasonal Frequency
+--- | ---: | ---
+Jan | 42 | █
+Feb | 89 | ██
+Mar | 310 | ██████
+Apr | 1,420 | ████████████████████████
+May | 2,890 | ████████████████████████████████████████████████ (Peak)
+Jun | 1,840 | ███████████████████████████████
+Jul | 1,120 | ███████████████████
+Aug | 940 | ████████████████
+Sep | 1,650 | ████████████████████████████
+Oct | 810 | ██████████████
+Nov | 120 | ██
+Dec | 30 | █
+```
+
+### 4. Cross-MCP Bridging with `thesven/ebird-mcp`
+When used alongside [`thesven/ebird-mcp`](https://github.com/thesven/ebird-mcp), agents can freely exchange taxon queries between systems:
+- Pass Cornell eBird 6-letter species codes (`ebird:baleag`, `mcp:ebird:rebwoo`) directly into `search_species` or taxon observation tools.
+- Cross-verify eBird audio checklists with iNaturalist community photo evidence.
+- Correlate seasonal abundance trends across both global citizen-science platforms.
+
+### 5. Continuous Leaky Bucket Rate Limiting
+To strictly honor iNaturalist's API acceptable use policy (sustained limit of 60 requests/minute, max burst 100 req/min), the server includes an in-memory thread-safe `LeakyBucketLimiter` enforcing a 1.1-second minimum request interval. Combined with an in-memory TTL cache (`SimpleCache`) storing taxonomy and place boundaries for 24 hours, the server guarantees zero HTTP 429 throttling errors.
+
+---
+
+## Example Natural Language Prompts
+
+Try these prompts in Claude Desktop, Cursor, or your AI runtime:
+
+- **Lookalike Comparison:**
+  > *"Compare the diagnostic field marks between a Monarch Butterfly and a Viceroy Butterfly. Check their mutual confusion records and seasonality curves in Ohio."*
+
+- **Visual Evidence Inspection:**
+  > *"Find recent observation photos of Red-tailed Hawks in Golden Gate Park using `view_observation_photos` and inspect the patagial marks on their wings."*
+
+- **Regional Biodiversity Audit:**
+  > *"Run a biodiversity survey for Yellowstone National Park. What are the top 10 most observed plant and mammal species, and are any of them flagged with conservation notices?"*
+
+- **eBird Cross-Lookup:**
+  > *"Look up species code `baleag` from eBird, resolve its iNaturalist taxon details, and show me recent research-grade sightings near 43.65, -79.38."*
+
+---
+
 ## Tool Reference
 
 ### AI Discovery & Species Resolution
